@@ -16,73 +16,42 @@ import {
   InputAdornment,
   IconButton, 
   Chip, 
-  Badge,
   useTheme,
-  styled
+  useMediaQuery,
+  Menu,
+  MenuItem,
+  Grid,
+  Stack,
+  Card,
+  CardContent,
+  CardActions,
+  Fade
 } from '@mui/material';
 import { 
   Search, 
   ConnectWithoutContact, 
   RocketLaunch, 
   Logout, 
-  Notifications,
-  ArrowBack
+  MoreVert,
+  Login,
+  HowToReg,
+  Groups,
+  Work,
+  Article
 } from '@mui/icons-material';
-
-const HeroSection = styled(Box)(({ theme }) => ({
-  background: theme.palette.mode === 'dark'
-    ? 'linear-gradient(135deg, #2c3e50 0%, #1a1a2e 100%)'
-    : 'linear-gradient(135deg, #3498db 0%, #2c3e50 100%)',
-  color: theme.palette.common.white,
-  padding: theme.spacing(8, 2),
-  textAlign: 'center',
-  borderRadius: theme.shape.borderRadius,
-  marginBottom: theme.spacing(4),
-  boxShadow: theme.shadows[10],
-  position: 'relative',
-  overflow: 'hidden',
-  '&:before': {
-    content: '""',
-    position: 'absolute',
-    top: -50,
-    right: -50,
-    width: 200,
-    height: 200,
-    background: 'rgba(255,255,255,0.1)',
-    borderRadius: '50%',
-  },
-  '&:after': {
-    content: '""',
-    position: 'absolute',
-    bottom: -80,
-    left: -80,
-    width: 250,
-    height: 250,
-    background: 'rgba(255,255,255,0.05)',
-    borderRadius: '50%',
-  }
-}));
-
-const UserCard = styled(Paper)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: theme.spacing(2),
-  marginBottom: theme.spacing(2),
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    transform: 'translateY(-3px)',
-    boxShadow: theme.shadows[4],
-    backgroundColor: theme.palette.action.hover
-  }
-}));
 
 export default function Home() {
   const { user, logout } = useContext(AuthContext);
   const [refresh, setRefresh] = useState(false);
   const [users, setUsers] = useState([]);
   const [postSearchTerm, setPostSearchTerm] = useState('');
+  const [showPostForm, setShowPostForm] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+
   const navigate = useNavigate();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     if (user) {
@@ -102,228 +71,251 @@ export default function Home() {
     setRefresh(r => !r);
   };
 
-  const goProfile = (id) => navigate(`/profile/${id}`);
-  
   const handleLogout = () => {
     logout();
-    navigate('/login'); // Redirect to login page after logout
+    navigate('/login');
+  };
+
+  const goProfile = (id) => navigate(`/profile/${id}`);
+
+  const toggleSuggestions = () => setShowSuggestions(!showSuggestions);
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
   };
 
   if (!user) {
     return (
-      <Container maxWidth="md">
-        <HeroSection>
-          <Typography variant="h3" gutterBottom sx={{ 
-            fontWeight: 700,
-            position: 'relative',
-            zIndex: 1
-          }}>
-            Welcome to Mini-LinkedIn
-          </Typography>
-          <Typography variant="h6" sx={{ 
-            mb: 4,
-            position: 'relative',
-            zIndex: 1,
-            opacity: 0.9
-          }}>
-            Connect with professionals and grow your network
-          </Typography>
-          <Box position="relative" zIndex={1}>
-            <Button
-              component={Link}
-              to="/login"
-              variant="contained"
-              size="large"
-              startIcon={<RocketLaunch />}
-              sx={{ 
-                mr: 2,
-                px: 4,
-                boxShadow: theme.shadows[4],
-                '&:hover': {
-                  transform: 'translateY(-2px)'
-                }
-              }}
-            >
-              Login
-            </Button>
-            <Button 
-              component={Link} 
-              to="/register" 
-              variant="outlined"
-              size="large"
+      <Container maxWidth="md" sx={{ py: 8 }}>
+        <Grid container spacing={4} alignItems="center" justifyContent="center">
+          <Grid item xs={12} md={6}>
+            <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+              <Typography 
+                variant="h3" 
+                fontWeight="bold" 
+                gutterBottom
+                sx={{ 
+                  color: theme.palette.primary.main,
+                  mb: 3
+                }}
+              >
+                Welcome to Mini-LinkedIn
+              </Typography>
+              <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
+                Connect with professionals and grow your network
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                Join our community to share posts, connect with others, and discover new opportunities.
+              </Typography>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <Button
+                  component={Link}
+                  to="/login"
+                  variant="contained"
+                  size="large"
+                  startIcon={<Login />}
+                  sx={{ px: 4, py: 1.5 }}
+                >
+                  Login
+                </Button>
+                <Button
+                  component={Link}
+                  to="/register"
+                  variant="outlined"
+                  size="large"
+                  startIcon={<HowToReg />}
+                  sx={{ px: 4, py: 1.5 }}
+                >
+                  Register
+                </Button>
+              </Stack>
+            </Box>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Box
               sx={{
-                color: 'white',
-                borderColor: 'white',
-                px: 4,
-                '&:hover': {
-                  backgroundColor: 'rgba(255,255,255,0.1)'
-                }
+                background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.light} 100%)`,
+                borderRadius: 4,
+                p: 4,
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
               }}
             >
-              Register
-            </Button>
-          </Box>
-        </HeroSection>
-
-        <Box display="flex" justifyContent="center" mt={6}>
-          <Button 
-            variant="text" 
-            startIcon={<ArrowBack />}
-            onClick={() => navigate(-1)}
-            sx={{ color: theme.palette.text.secondary }}
-          >
-            Go Back
-          </Button>
-        </Box>
+              <Stack spacing={3}>
+                <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
+                  <CardContent>
+                    <Box display="flex" alignItems="center" mb={1}>
+                      <Groups color="primary" sx={{ fontSize: 40, mr: 2 }} />
+                      <Typography variant="h6">Build Your Network</Typography>
+                    </Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Connect with professionals in your field and expand your opportunities.
+                    </Typography>
+                  </CardContent>
+                </Card>
+                <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
+                  <CardContent>
+                    <Box display="flex" alignItems="center" mb={1}>
+                      <Work color="primary" sx={{ fontSize: 40, mr: 2 }} />
+                      <Typography variant="h6">Discover Opportunities</Typography>
+                    </Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Find job postings, collaborations, and projects that match your skills.
+                    </Typography>
+                  </CardContent>
+                </Card>
+                <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
+                  <CardContent>
+                    <Box display="flex" alignItems="center" mb={1}>
+                      <Article color="primary" sx={{ fontSize: 40, mr: 2 }} />
+                      <Typography variant="h6">Share Your Expertise</Typography>
+                    </Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Post articles, share insights, and engage with your community.
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Stack>
+            </Box>
+          </Grid>
+        </Grid>
       </Container>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Header with Logout */}
-     <Box display="flex" justifyContent="flex-end" mb={2}>
-  <IconButton 
-    onClick={handleLogout} 
-    color="primary" 
-    sx={{ mr: 1 }}
-    title="Logout"
-  >
-    <Logout />
-  </IconButton>
-</Box>
-
-      <Box display="flex" gap={4} flexDirection={{ xs: 'column', md: 'row' }}>
-        {/* Sidebar */}
-        <Box sx={{ width: { xs: '100%', md: '30%' } }}>
-          {/* User Profile Card */}
-          <Paper sx={{ 
-            mb: 3, 
-            p: 3,
-            borderRadius: 4,
-            boxShadow: theme.shadows[3],
-            background: theme.palette.background.paper
-          }}>
-            <Box display="flex" alignItems="center" mb={2}>
-              <Avatar 
-                src={user.avatar}
-                sx={{ 
-                  width: 56, 
-                  height: 56, 
-                  mr: 2,
-                  fontSize: '1.5rem',
-                  bgcolor: theme.palette.primary.main
-                }}
+    <Container maxWidth="lg" sx={{ py: 3 }}>
+      {/* Header */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography 
+          variant="h4" 
+          fontWeight="bold"
+          sx={{
+            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            display: 'inline-block'
+          }}
+        >
+          Mini-LinkedIn
+        </Typography>
+        <Box display="flex" alignItems="center" gap={1}>
+          {isMobile && (
+            <>
+              <IconButton onClick={handleMenuClick} sx={{ color: theme.palette.text.primary }}>
+                <MoreVert />
+              </IconButton>
+              <Menu 
+                anchorEl={anchorEl} 
+                open={Boolean(anchorEl)} 
+                onClose={handleMenuClose}
+                TransitionComponent={Fade}
               >
-                {user.name?.charAt(0)?.toUpperCase() || 'U'}
-              </Avatar>
-              <Box>
-                <Typography variant="h6" fontWeight="bold">{user.name}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {user.email}
-                </Typography>
-              </Box>
-            </Box>
-            <PostForm onPost={() => setRefresh(r => !r)} />
-          </Paper>
+                <MenuItem onClick={() => { toggleSuggestions(); handleMenuClose(); }}>
+                  {showSuggestions ? 'Hide Suggestions' : 'Show Suggestions'}
+                </MenuItem>
+              </Menu>
+            </>
+          )}
+          <IconButton 
+            onClick={handleLogout}
+            sx={{
+              backgroundColor: theme.palette.error.light,
+              color: theme.palette.error.contrastText,
+              '&:hover': {
+                backgroundColor: theme.palette.error.main
+              }
+            }}
+          >
+            <Logout />
+          </IconButton>
+        </Box>
+      </Box>
 
-          {/* Suggested Connections */}
-          <Paper sx={{ 
-            p: 3, 
-            borderRadius: 4,
-            boxShadow: theme.shadows[3],
-            maxHeight: 400,
-            overflowY: 'auto',
-            '&::-webkit-scrollbar': {
-              width: '6px'
-            },
-            '&::-webkit-scrollbar-thumb': {
-              backgroundColor: theme.palette.primary.main,
-              borderRadius: '3px'
-            }
-          }}>
-            <Box display="flex" alignItems="center" mb={2}>
-              <ConnectWithoutContact color="primary" sx={{ mr: 1 }} />
-              <Typography variant="h6" fontWeight="bold">
-                Suggested Connections
-              </Typography>
-            </Box>
-            <Divider sx={{ mb: 2 }} />
-            
-            {users.length === 0 ? (
-              <Typography variant="body2" color="text.secondary" textAlign="center">
-                No other users found
-              </Typography>
-            ) : (
-              users.slice(0, 5).map((u) => (
-                <UserCard
-                  key={u._id}
-                  elevation={0}
-                  onClick={() => goProfile(u._id)}
-                >
-                  <Avatar 
-                    src={u.avatar} 
-                    sx={{ 
-                      mr: 2,
-                      width: 40,
-                      height: 40,
-                      bgcolor: theme.palette.secondary.main
-                    }}
-                  >
-                    {u?.name?.charAt(0)?.toUpperCase() || '?'}
-                  </Avatar>
-                  <Box flexGrow={1}>
-                    <Typography fontWeight="bold">{u?.name || 'Unknown'}</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {u?.bio || u?.email || 'No bio'}
-                    </Typography>
-                  </Box>
-                  <Chip 
-                    label="Connect" 
-                    size="small" 
-                    color="primary" 
-                    variant="outlined"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Add connection logic here
-                    }}
-                  />
-                </UserCard>
-              ))
-            )}
+      {/* Mobile Layout */}
+      {isMobile ? (
+        <Box>
+          {/* Create Post Button */}
+          {!showPostForm && (
             <Button
-              component={Link}
-              to="/network"
               fullWidth
-              variant="outlined"
+              variant="contained"
+              onClick={() => setShowPostForm(true)}
               sx={{ 
-                mt: 2,
-                borderRadius: 2,
-                py: 1
+                mb: 2,
+                py: 1.5,
+                borderRadius: 3,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                '&:hover': {
+                  boxShadow: '0 6px 8px rgba(0,0,0,0.15)'
+                }
               }}
             >
-              View All Connections
+              Create a Post
             </Button>
-          </Paper>
-        </Box>
+          )}
 
-        {/* Main Feed */}
-        <Box sx={{ width: { xs: '100%', md: '70%' } }}>
+          {/* Post Form */}
+          {showPostForm && (
+            <Paper sx={{ 
+              p: 2, 
+              mb: 2,
+              borderRadius: 3,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+            }}>
+              {/* Added user profile at top of post form */}
+              <Box 
+                display="flex" 
+                alignItems="center" 
+                mb={2}
+                onClick={() => goProfile(user._id)}
+                sx={{
+                  cursor: 'pointer',
+                  '&:hover': {
+                    backgroundColor: theme.palette.action.hover,
+                    borderRadius: 1
+                  },
+                  p: 1
+                }}
+              >
+                <Avatar 
+                  src={user.avatar} 
+                  sx={{ 
+                    mr: 2,
+                    width: 48,
+                    height: 48,
+                    border: `2px solid ${theme.palette.primary.main}`
+                  }} 
+                />
+                <Box>
+                  <Typography fontWeight="medium">{user.name}</Typography>
+                  <Typography variant="body2" color="text.secondary">Posting as yourself</Typography>
+                </Box>
+              </Box>
+              <PostForm onPost={() => { setShowPostForm(false); setRefresh(r => !r); }} />
+            </Paper>
+          )}
+
           {/* Post Search */}
-          <Paper
-            component="form"
-            onSubmit={handleSearch}
+          <Paper 
+            component="form" 
+            onSubmit={handleSearch} 
             sx={{ 
-              mb: 3, 
+              mb: 2, 
               p: 2,
-              display: 'flex',
-              borderRadius: 4,
-              boxShadow: theme.shadows[3]
+              borderRadius: 3,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
             }}
           >
             <TextField
               fullWidth
-              placeholder="Search posts (e.g. internship, jobs)..."
+              placeholder="Search posts..."
               value={postSearchTerm}
               onChange={(e) => setPostSearchTerm(e.target.value)}
               InputProps={{
@@ -333,74 +325,206 @@ export default function Home() {
                   </InputAdornment>
                 ),
                 sx: {
-                  borderRadius: 2
-                }
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderColor: 'transparent'
-                  },
-                  '&:hover fieldset': {
-                    borderColor: 'transparent'
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: 'transparent'
-                  }
+                  borderRadius: 3,
                 }
               }}
             />
-            <Button 
-              type="submit" 
-              variant="contained" 
-              sx={{ 
-                ml: 2,
-                px: 3,
-                borderRadius: 2,
-                textTransform: 'none'
-              }}
-            >
-              Search
-            </Button>
           </Paper>
 
-          {/* Post List */}
-          <Paper sx={{ 
-            p: 3, 
-            borderRadius: 4,
-            boxShadow: theme.shadows[3],
-            maxHeight: 'calc(100vh - 200px)',
-            overflowY: 'auto',
-            '&::-webkit-scrollbar': {
-              width: '6px'
-            },
-            '&::-webkit-scrollbar-thumb': {
-              backgroundColor: theme.palette.primary.main,
-              borderRadius: '3px'
-            }
-          }}>
-            <Box display="flex" alignItems="center" mb={3}>
-              <Typography variant="h5" fontWeight="bold">
-                Recent Updates
-              </Typography>
-              {postSearchTerm && (
-                <Chip
-                  label={`Filter: ${postSearchTerm}`}
-                  onDelete={() => setPostSearchTerm('')}
-                  color="primary"
-                  variant="outlined"
-                  sx={{ ml: 2 }}
-                />
-              )}
-            </Box>
-            <Divider sx={{ mb: 3 }} />
-            <PostList
-              key={`${refresh}-${postSearchTerm}`}
-              searchTerm={postSearchTerm}
-            />
-          </Paper>
+          {/* Suggested Connections (toggle) */}
+          {showSuggestions && (
+            <Paper sx={{ 
+              mb: 2, 
+              p: 2,
+              borderRadius: 3,
+              background: theme.palette.background.paper,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+              maxHeight: 400,
+              overflowY: 'auto'
+            }}>
+              <Box display="flex" alignItems="center" mb={1}>
+                <ConnectWithoutContact color="primary" sx={{ mr: 1 }} />
+                <Typography variant="h6" color="primary">Suggested Connections</Typography>
+              </Box>
+              <Divider sx={{ mb: 2 }} />
+              {/* Removed the slice(0, 5) to show all users with scroll */}
+              {users.map((u) => (
+                <Box 
+                  key={u._id} 
+                  display="flex" 
+                  alignItems="center" 
+                  mb={2}
+                  sx={{
+                    p: 1.5,
+                    borderRadius: 2,
+                    '&:hover': {
+                      backgroundColor: theme.palette.action.hover
+                    }
+                  }}
+                >
+                  <Avatar 
+                    src={u.avatar} 
+                    sx={{ 
+                      mr: 2,
+                      width: 48,
+                      height: 48,
+                      border: `2px solid ${theme.palette.primary.main}`
+                    }} 
+                  />
+                  <Box flexGrow={1}>
+                    <Typography fontWeight="medium">{u.name}</Typography>
+                    <Typography variant="body2" color="text.secondary">{u.bio || u.email}</Typography>
+                  </Box>
+                  <Chip 
+                    label="Connect" 
+                    variant="outlined" 
+                    color="primary"
+                    clickable
+                  />
+                </Box>
+              ))}
+            </Paper>
+          )}
+
+          {/* Posts */}
+          <PostList key={`${refresh}-${postSearchTerm}`} searchTerm={postSearchTerm} />
         </Box>
-      </Box>
+      ) : (
+        // Desktop Layout
+        <Box display="flex" gap={4}>
+          {/* Left Side - Post Form + Suggestions */}
+          <Box sx={{ width: '30%' }}>
+            <Paper sx={{ 
+              p: 3, 
+              mb: 3,
+              borderRadius: 3,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+            }}>
+              {/* Added user profile at top of post form */}
+              <Box 
+                display="flex" 
+                alignItems="center" 
+                mb={2}
+                onClick={() => goProfile(user._id)}
+                sx={{
+                  cursor: 'pointer',
+                  '&:hover': {
+                    backgroundColor: theme.palette.action.hover,
+                    borderRadius: 1
+                  },
+                  p: 1
+                }}
+              >
+                <Avatar 
+                  src={user.avatar} 
+                  sx={{ 
+                    mr: 2,
+                    width: 48,
+                    height: 48,
+                    border: `2px solid ${theme.palette.primary.main}`
+                  }} 
+                />
+                <Box>
+                  <Typography fontWeight="medium">{user.name}</Typography>
+                  <Typography variant="body2" color="text.secondary">Posting as yourself</Typography>
+                </Box>
+              </Box>
+              <PostForm onPost={() => setRefresh(r => !r)} />
+            </Paper>
+            <Paper sx={{ 
+              p: 3, 
+              maxHeight: 400, 
+              overflowY: 'auto',
+              borderRadius: 3,
+              background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${theme.palette.background.default} 100%)`,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+            }}>
+              <Box display="flex" alignItems="center" mb={2}>
+                <ConnectWithoutContact color="primary" sx={{ mr: 1 }} />
+                <Typography variant="h6" color="primary">Suggested Connections</Typography>
+              </Box>
+              <Divider sx={{ mb: 2 }} />
+              {/* Removed the slice(0, 5) to show all users with scroll */}
+              {users.map((u) => (
+                <Box 
+                  key={u._id} 
+                  display="flex" 
+                  alignItems="center" 
+                  mb={2}
+                  sx={{
+                    p: 1.5,
+                    borderRadius: 2,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      backgroundColor: theme.palette.action.hover,
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                    }
+                  }}
+                >
+                  <Avatar 
+                    src={u.avatar} 
+                    sx={{ 
+                      mr: 2,
+                      width: 48,
+                      height: 48,
+                      border: `2px solid ${theme.palette.primary.main}`
+                    }} 
+                  />
+                  <Box flexGrow={1}>
+                    <Typography fontWeight="medium">{u.name}</Typography>
+                    <Typography variant="body2" color="text.secondary">{u.bio || u.email}</Typography>
+                  </Box>
+                  <Chip 
+                    label="Connect" 
+                    variant="outlined" 
+                    color="primary"
+                    clickable
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: theme.palette.primary.light
+                      }
+                    }}
+                  />
+                </Box>
+              ))}
+            </Paper>
+          </Box>
+
+          {/* Right Side - Search + Posts */}
+          <Box sx={{ width: '70%' }}>
+            <Paper 
+              component="form" 
+              onSubmit={handleSearch} 
+              sx={{ 
+                mb: 3, 
+                p: 2,
+                borderRadius: 3,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+              }}
+            >
+              <TextField
+                fullWidth
+                placeholder="Search posts..."
+                value={postSearchTerm}
+                onChange={(e) => setPostSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search color="primary" />
+                    </InputAdornment>
+                  ),
+                  sx: {
+                    borderRadius: 3,
+                  }
+                }}
+              />
+            </Paper>
+
+            <PostList key={`${refresh}-${postSearchTerm}`} searchTerm={postSearchTerm} />
+          </Box>
+        </Box>
+      )}
     </Container>
   );
 }
