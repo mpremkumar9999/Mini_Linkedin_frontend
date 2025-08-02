@@ -1,0 +1,17 @@
+.profile-container {
+  max-width: 700px;
+  margin: auto;
+  padding: 20px;
+}
+
+.profile-header {
+  background: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.profile-header h2 {
+  margin: 5px 0;
+}
